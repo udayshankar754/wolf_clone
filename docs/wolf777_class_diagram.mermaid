@@ -1,0 +1,315 @@
+classDiagram
+    class User {
+        +id: int
+        +email: string
+        +phone_number: string
+        +password_hash: string
+        +first_name: string
+        +last_name: string
+        +date_of_birth: Date
+        +country: string
+        +is_verified: boolean
+        +account_status: enum
+        +register(userData: UserRegistrationDTO): User
+        +login(credentials: LoginDTO): AuthTokens
+        +updateProfile(profileData: ProfileUpdateDTO): User
+        +uploadDocument(document: DocumentUploadDTO): UserDocument
+        +getTransactions(): Transaction[]
+        +getBets(): Bet[]
+    }
+
+    class UserPreferences {
+        +user_id: int
+        +odds_format: enum
+        +language: string
+        +timezone: string
+        +notification_preferences: JSON
+        +theme: enum
+        +updatePreferences(preferences: PreferencesDTO): UserPreferences
+    }
+
+    class UserDocument {
+        +id: int
+        +user_id: int
+        +document_type: enum
+        +document_url: string
+        +public_id: string
+        +verification_status: enum
+        +uploadDocument(file: File, type: string): UserDocument
+        +verifyDocument(id: int, status: string): boolean
+    }
+
+    class Wallet {
+        +id: int
+        +user_id: int
+        +balance: decimal
+        +bonus_balance: decimal
+        +getBalance(): BalanceDTO
+        +deposit(amount: decimal, method: string): Transaction
+        +withdraw(amount: decimal, method: string): Transaction
+        +updateBalance(amount: decimal, type: string): boolean
+    }
+
+    class Transaction {
+        +id: int
+        +transaction_reference: string
+        +user_id: int
+        +wallet_id: int
+        +transaction_type: enum
+        +amount: decimal
+        +currency: string
+        +status: enum
+        +payment_method: string
+        +createTransaction(data: TransactionDTO): Transaction
+        +updateStatus(id: int, status: string): boolean
+        +getByUser(userId: int): Transaction[]
+    }
+
+    class Sport {
+        +id: int
+        +name: string
+        +slug: string
+        +icon_url: string
+        +is_active: boolean
+        +getAll(): Sport[]
+        +getSport(id: int): Sport
+        +getLeagues(sportId: int): League[]
+        +getFeatured(): Sport[]
+    }
+
+    class League {
+        +id: int
+        +sport_id: int
+        +name: string
+        +slug: string
+        +country: string
+        +logo_url: string
+        +is_active: boolean
+        +getAll(): League[]
+        +getLeague(id: int): League
+        +getEvents(leagueId: int): Event[]
+        +getFeatured(): League[]
+    }
+
+    class Event {
+        +id: int
+        +league_id: int
+        +home_team: string
+        +away_team: string
+        +start_time: timestamp
+        +status: enum
+        +result: JSON
+        +statistics: JSON
+        +is_featured: boolean
+        +streaming_available: boolean
+        +getEvent(id: int): EventDTO
+        +getLive(): Event[]
+        +getUpcoming(): Event[]
+        +getPopular(): Event[]
+        +getMarkets(eventId: int): Market[]
+    }
+
+    class Market {
+        +id: int
+        +event_id: int
+        +name: string
+        +market_type: string
+        +status: enum
+        +getByEvent(eventId: int): Market[]
+        +getSelections(marketId: int): Selection[]
+        +updateStatus(id: int, status: string): boolean
+    }
+
+    class Selection {
+        +id: int
+        +market_id: int
+        +name: string
+        +odds: decimal
+        +status: enum
+        +result: enum
+        +getByMarket(marketId: int): Selection[]
+        +updateOdds(id: int, odds: decimal): boolean
+        +updateStatus(id: int, status: string): boolean
+        +settle(id: int, result: string): boolean
+    }
+
+    class Bet {
+        +id: int
+        +user_id: int
+        +bet_reference: string
+        +bet_type: enum
+        +total_stake: decimal
+        +potential_return: decimal
+        +status: enum
+        +cashout_value: decimal
+        +placed_at: timestamp
+        +settled_at: timestamp
+        +placeBet(betData: BetPlacementDTO): Bet
+        +getByUser(userId: int): Bet[]
+        +getBet(id: int): BetDTO
+        +cashout(id: int): Transaction
+        +settle(id: int, status: string): boolean
+    }
+
+    class BetSelection {
+        +id: int
+        +bet_id: int
+        +selection_id: int
+        +odds: decimal
+        +result: enum
+        +createBetSelection(data: BetSelectionDTO): BetSelection
+        +updateResult(id: int, result: string): boolean
+        +getByBet(betId: int): BetSelection[]
+    }
+
+    class CasinoGame {
+        +id: int
+        +name: string
+        +provider: string
+        +category: enum
+        +thumbnail_url: string
+        +game_url: string
+        +min_bet: decimal
+        +max_bet: decimal
+        +rtp: decimal
+        +is_featured: boolean
+        +is_new: boolean
+        +is_popular: boolean
+        +is_active: boolean
+        +getAll(): CasinoGame[]
+        +getByCategory(category: string): CasinoGame[]
+        +getGame(id: int): CasinoGameDTO
+        +getPopular(): CasinoGame[]
+        +getRecent(userId: int): CasinoGame[]
+        +launchGame(id: int, userId: int): GameLaunchDTO
+    }
+
+    class GameSession {
+        +id: int
+        +user_id: int
+        +game_id: int
+        +session_token: string
+        +balance_before: decimal
+        +total_bet: decimal
+        +total_win: decimal
+        +started_at: timestamp
+        +ended_at: timestamp
+        +createSession(data: GameSessionDTO): GameSession
+        +updateSession(id: int, betAmount: decimal, winAmount: decimal): boolean
+        +endSession(id: int): boolean
+        +getByUser(userId: int): GameSession[]
+    }
+
+    class Promotion {
+        +id: int
+        +name: string
+        +description: string
+        +promotion_type: enum
+        +image_url: string
+        +start_date: timestamp
+        +end_date: timestamp
+        +is_active: boolean
+        +terms_conditions: string
+        +minimum_deposit: decimal
+        +bonus_percentage: int
+        +maximum_bonus: decimal
+        +wagering_requirement: int
+        +eligible_games: JSON
+        +getAll(): Promotion[]
+        +getActive(): Promotion[]
+        +getPromotion(id: int): PromotionDTO
+    }
+
+    class UserPromotion {
+        +id: int
+        +user_id: int
+        +promotion_id: int
+        +claimed_at: timestamp
+        +status: enum
+        +bonus_amount: decimal
+        +wagered_amount: decimal
+        +remaining_wager: decimal
+        +expiry_date: timestamp
+        +claimPromotion(userId: int, promotionId: int): UserPromotion
+        +updateWageredAmount(id: int, amount: decimal): boolean
+        +getUserPromotions(userId: int): UserPromotion[]
+    }
+
+    class LoyaltyPoints {
+        +id: int
+        +user_id: int
+        +points: int
+        +lifetime_points: int
+        +current_tier: string
+        +getUserStatus(userId: int): LoyaltyPointsDTO
+        +addPoints(userId: int, points: int, reason: string): boolean
+        +usePoints(userId: int, points: int, reason: string): boolean
+        +updateTier(userId: int): boolean
+    }
+
+    class AuthService {
+        +register(userData: UserRegistrationDTO): AuthResponseDTO
+        +login(credentials: LoginDTO): AuthTokensDTO
+        +refreshToken(token: string): AuthTokensDTO
+        +verifyEmail(token: string): boolean
+        +forgotPassword(email: string): boolean
+        +resetPassword(token: string, password: string): boolean
+        +logout(userId: int): boolean
+    }
+
+    class BettingService {
+        +getOdds(eventId: int): OddsDTO[]
+        +placeBet(betData: BetPlacementDTO): BetResponseDTO
+        +cashout(betId: int): CashoutResponseDTO
+        +getBetHistory(userId: int): BetDTO[]
+        +getBetDetails(betId: int): BetDetailDTO
+    }
+
+    class WalletService {
+        +getBalance(userId: int): BalanceDTO
+        +deposit(userId: int, data: DepositDTO): TransactionDTO
+        +withdraw(userId: int, data: WithdrawDTO): TransactionDTO
+        +getTransactions(userId: int): TransactionDTO[]
+        +getPaymentMethods(): PaymentMethodDTO[]
+    }
+
+    class NotificationService {
+        +sendNotification(userId: int, type: string, data: any): boolean
+        +getUserNotifications(userId: int): NotificationDTO[]
+        +markAsRead(notificationId: int): boolean
+        +subscribeToEvents(userId: int, events: string[]): boolean
+    }
+
+    class CloudinaryService {
+        +uploadImage(file: File, folder: string): UploadResultDTO
+        +deleteImage(publicId: string): boolean
+        +generateSignature(params: any): string
+        +getTransformedUrl(publicId: string, transformations: any): string
+    }
+
+    class RedisService {
+        +set(key: string, value: any, expiry: int): boolean
+        +get(key: string): any
+        +del(key: string): boolean
+        +publish(channel: string, message: any): boolean
+        +subscribe(channel: string, callback: Function): boolean
+        +rateLimit(key: string, limit: int, window: int): boolean
+    }
+
+    User "1" -- "1" UserPreferences : has
+    User "1" -- "*" UserDocument : uploads
+    User "1" -- "1" Wallet : owns
+    User "1" -- "*" Transaction : makes
+    User "1" -- "*" Bet : places
+    Wallet "1" -- "*" Transaction : records
+    Sport "1" -- "*" League : contains
+    League "1" -- "*" Event : schedules
+    Event "1" -- "*" Market : offers
+    Market "1" -- "*" Selection : includes
+    Bet "1" -- "*" BetSelection : contains
+    Selection "1" -- "*" BetSelection : referenced in
+    User "1" -- "*" GameSession : participates in
+    CasinoGame "1" -- "*" GameSession : generates
+    Promotion "1" -- "*" UserPromotion : claimed by
+    User "1" -- "*" UserPromotion : claims
+    User "1" -- "1" LoyaltyPoints : earns

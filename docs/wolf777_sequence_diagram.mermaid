@@ -1,0 +1,240 @@
+sequenceDiagram
+    participant Client as Frontend Client
+    participant AuthC as AuthController
+    participant AuthS as AuthService
+    participant UserS as UserService
+    participant DB as Database
+    participant Redis as Redis Cache
+    participant NotifS as NotificationService
+    participant Email as EmailService
+    
+    %% User Registration Flow
+    note over Client, Email: User Registration Process
+    Client->>AuthC: POST /api/auth/register (email, password, etc)
+    AuthC->>AuthS: register(userData)
+    AuthS->>DB: checkUserExists(email)
+    DB-->>AuthS: userExists (true/false)
+    alt User already exists
+        AuthS-->>AuthC: Error: User already exists
+        AuthC-->>Client: 409 Conflict - User exists
+    else User does not exist
+        AuthS->>DB: createUser(userData)
+        DB-->>AuthS: user
+        AuthS->>Email: sendVerificationEmail(user.email, token)
+        AuthS-->>AuthC: registrationSuccess(user, token)
+        AuthC-->>Client: 201 Created - Registration successful
+        Client->>Client: Store token/redirect to verification page
+    end
+
+    %% Login Flow
+    note over Client, Redis: User Login Process
+    Client->>AuthC: POST /api/auth/login (email, password)
+    AuthC->>AuthS: login(credentials)
+    AuthS->>DB: findUserByEmail(email)
+    DB-->>AuthS: user
+    alt User not found
+        AuthS-->>AuthC: Error: Invalid credentials
+        AuthC-->>Client: 401 Unauthorized
+    else User found
+        AuthS->>AuthS: verifyPassword(password, user.password_hash)
+        alt Password invalid
+            AuthS-->>AuthC: Error: Invalid credentials
+            AuthC-->>Client: 401 Unauthorized
+        else Password valid
+            AuthS->>AuthS: generateTokens(user.id)
+            AuthS->>Redis: storeRefreshToken(user.id, token, expiry)
+            AuthS-->>AuthC: loginSuccess(tokens, user)
+            AuthC-->>Client: 200 OK - Login successful with tokens
+            Client->>Client: Store tokens and user data
+        end
+    end
+
+    %% Sports Betting Flow
+    participant SportC as SportsController
+    participant SportS as SportsService
+    participant EventS as EventService
+    participant BetS as BettingService
+    participant WalletS as WalletService
+
+    note over Client, WalletS: Sports Betting Process
+    Client->>SportC: GET /api/sports
+    SportC->>SportS: getAllSports()
+    SportS->>Redis: getCachedSports()
+    alt Cache hit
+        Redis-->>SportS: cachedSports
+    else Cache miss
+        SportS->>DB: fetchAllSports()
+        DB-->>SportS: sports
+        SportS->>Redis: cacheSports(sports, TTL)
+    end
+    SportS-->>SportC: sports
+    SportC-->>Client: 200 OK - Sports list
+
+    Client->>SportC: GET /api/sports/{id}/leagues
+    SportC->>SportS: getLeaguesBySport(sportId)
+    SportS->>Redis: getCachedLeagues(sportId)
+    alt Cache hit
+        Redis-->>SportS: cachedLeagues
+    else Cache miss
+        SportS->>DB: fetchLeaguesBySport(sportId)
+        DB-->>SportS: leagues
+        SportS->>Redis: cacheLeagues(sportId, leagues, TTL)
+    end
+    SportS-->>SportC: leagues
+    SportC-->>Client: 200 OK - Leagues list
+
+    Client->>SportC: GET /api/events/{id}
+    SportC->>EventS: getEventDetails(eventId)
+    EventS->>Redis: getCachedEvent(eventId)
+    alt Cache hit
+        Redis-->>EventS: cachedEvent
+    else Cache miss
+        EventS->>DB: fetchEventWithMarkets(eventId)
+        DB-->>EventS: event
+        EventS->>Redis: cacheEvent(eventId, event, TTL)
+    end
+    EventS-->>SportC: eventDetails
+    SportC-->>Client: 200 OK - Event details with markets
+
+    Client->>Client: User selects markets for bet
+    Client->>Client: Add selections to bet slip
+
+    participant BetC as BettingController
+    
+    Client->>BetC: POST /api/bets (selections, stake)
+    BetC->>AuthC: validateToken()
+    AuthC-->>BetC: userId
+    BetC->>BetS: placeBet(userId, betData)
+    BetS->>WalletS: checkBalance(userId, betData.stake)
+    WalletS->>DB: getUserWallet(userId)
+    DB-->>WalletS: wallet
+    alt Insufficient balance
+        WalletS-->>BetS: Error: Insufficient balance
+        BetS-->>BetC: Error: Insufficient balance
+        BetC-->>Client: 400 Bad Request - Insufficient balance
+    else Sufficient balance
+        BetS->>DB: beginTransaction()
+        BetS->>DB: createBet(userId, betType, stake, potentialReturn)
+        DB-->>BetS: newBet
+        loop For each selection
+            BetS->>DB: createBetSelection(betId, selectionId, odds)
+        end
+        BetS->>WalletS: deductBalance(userId, stake)
+        WalletS->>DB: updateWalletBalance(userId, -stake)
+        DB-->>WalletS: updated wallet
+        WalletS-->>BetS: balanceUpdateSuccess
+        BetS->>DB: commitTransaction()
+        BetS->>NotifS: sendBetConfirmation(userId, betDetails)
+        BetS-->>BetC: betPlacementSuccess(bet)
+        BetC-->>Client: 201 Created - Bet placed successfully
+    end
+
+    %% Casino Game Flow
+    participant CasinoC as CasinoController
+    participant CasinoS as CasinoService
+    participant GameProviderS as GameProviderService
+    
+    note over Client, GameProviderS: Casino Game Flow
+    Client->>CasinoC: GET /api/games/categories
+    CasinoC->>CasinoS: getCategories()
+    CasinoS->>Redis: getCachedCategories()
+    alt Cache hit
+        Redis-->>CasinoS: cachedCategories
+    else Cache miss
+        CasinoS->>DB: fetchCategories()
+        DB-->>CasinoS: categories
+        CasinoS->>Redis: cacheCategories(categories, TTL)
+    end
+    CasinoS-->>CasinoC: categories
+    CasinoC-->>Client: 200 OK - Game categories
+
+    Client->>CasinoC: GET /api/games?category=slots
+    CasinoC->>CasinoS: getGamesByCategory(category)
+    CasinoS->>Redis: getCachedGames(category)
+    alt Cache hit
+        Redis-->>CasinoS: cachedGames
+    else Cache miss
+        CasinoS->>DB: fetchGamesByCategory(category)
+        DB-->>CasinoS: games
+        CasinoS->>Redis: cacheGames(category, games, TTL)
+    end
+    CasinoS-->>CasinoC: games
+    CasinoC-->>Client: 200 OK - Games list
+
+    Client->>CasinoC: POST /api/games/launch/{id}
+    CasinoC->>AuthC: validateToken()
+    AuthC-->>CasinoC: userId
+    CasinoC->>CasinoS: launchGame(gameId, userId)
+    CasinoS->>DB: getGame(gameId)
+    DB-->>CasinoS: game
+    CasinoS->>WalletS: getBalance(userId)
+    WalletS->>DB: getUserWallet(userId)
+    DB-->>WalletS: wallet
+    WalletS-->>CasinoS: userBalance
+    CasinoS->>DB: createGameSession(userId, gameId)
+    DB-->>CasinoS: session
+    CasinoS->>GameProviderS: getGameUrl(game.provider, game.gameId, session.token, userBalance)
+    GameProviderS-->>CasinoS: gameUrl
+    CasinoS-->>CasinoC: launchData(gameUrl, session)
+    CasinoC-->>Client: 200 OK - Game launch data
+    Client->>Client: Redirect to game URL
+
+    %% Wallet Deposit Flow
+    participant WalletC as WalletController
+    participant PaymentS as PaymentService
+    
+    note over Client, NotifS: Wallet Deposit Flow
+    Client->>WalletC: GET /api/wallet/payment-methods
+    WalletC->>AuthC: validateToken()
+    AuthC-->>WalletC: userId
+    WalletC->>WalletS: getPaymentMethods()
+    WalletS->>Redis: getCachedPaymentMethods()
+    alt Cache hit
+        Redis-->>WalletS: cachedMethods
+    else Cache miss
+        WalletS->>DB: fetchPaymentMethods()
+        DB-->>WalletS: methods
+        WalletS->>Redis: cachePaymentMethods(methods, TTL)
+    end
+    WalletS-->>WalletC: paymentMethods
+    WalletC-->>Client: 200 OK - Available payment methods
+
+    Client->>WalletC: POST /api/wallet/deposit (amount, method)
+    WalletC->>AuthC: validateToken()
+    AuthC-->>WalletC: userId
+    WalletC->>WalletS: initiateDeposit(userId, amount, method)
+    WalletS->>PaymentS: createPaymentRequest(userId, amount, method)
+    PaymentS-->>WalletS: paymentRequestData
+    WalletS->>DB: saveTransactionRequest(userId, amount, paymentRef)
+    DB-->>WalletS: transaction
+    WalletS-->>WalletC: depositInitiated(paymentRequestData)
+    WalletC-->>Client: 200 OK - Payment initiation data
+    Client->>Client: Redirect to payment gateway
+
+    note over Client, NotifS: Payment Callback
+    PaymentS->>WalletS: paymentCallback(paymentRef, status)
+    WalletS->>DB: findTransaction(paymentRef)
+    DB-->>WalletS: transaction
+    alt Payment successful
+        WalletS->>DB: updateTransactionStatus(txId, 'completed')
+        WalletS->>DB: updateWalletBalance(userId, amount)
+        WalletS->>NotifS: sendDepositSuccessNotification(userId, amount)
+    else Payment failed
+        WalletS->>DB: updateTransactionStatus(txId, 'failed')
+        WalletS->>NotifS: sendDepositFailureNotification(userId, amount)
+    end
+    
+    Client->>WalletC: GET /api/wallet/balance
+    WalletC->>AuthC: validateToken()
+    AuthC-->>WalletC: userId
+    WalletC->>WalletS: getBalance(userId)
+    WalletS->>Redis: getCachedBalance(userId)
+    alt Cache hit
+        Redis-->>WalletS: cachedBalance
+    else Cache miss
+        WalletS->>DB: getUserWallet(userId)
+        DB-->>WalletS: wallet
+        WalletS->>Redis: cacheBalance(userId, wallet, shortTTL)
+    end
+    WalletS-->>WalletC: balanceData
+    WalletC-->>Client: 200 OK - User balance
