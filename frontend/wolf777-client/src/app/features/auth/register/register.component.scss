@@ -1,0 +1,180 @@
+// Register component styles
+.register-container {
+  min-height: calc(100vh - 60px);
+  padding: 40px 16px;
+  background-color: var(--background-color);
+}
+
+.register-card-wrapper {
+  width: 100%;
+  max-width: 600px;
+}
+
+.register-card {
+  padding: 24px;
+  background-color: var(--card-bg);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  
+  .register-header {
+    width: 100%;
+    text-align: center;
+    margin-bottom: 16px;
+    
+    .logo-container {
+      margin-bottom: 20px;
+      
+      .logo {
+        height: 50px;
+        max-width: 100%;
+      }
+    }
+    
+    .register-title {
+      font-size: 1.8rem;
+      font-weight: 700;
+      margin: 0 0 8px;
+      color: var(--text-color);
+    }
+    
+    .register-subtitle {
+      font-size: 0.95rem;
+      color: var(--text-color);
+      opacity: 0.7;
+      margin: 0;
+    }
+  }
+}
+
+// Error Alert Styling
+.error-alert {
+  background-color: rgba(244, 67, 54, 0.1);
+  color: #f44336;
+  padding: 12px;
+  border-radius: 4px;
+  margin-bottom: 16px;
+  
+  mat-icon {
+    margin-right: 8px;
+    font-size: 18px;
+    height: 18px;
+    width: 18px;
+  }
+}
+
+// Form Styling
+form {
+  margin: 16px 0;
+  
+  mat-form-field {
+    width: 100%;
+  }
+  
+  .terms-checkboxes {
+    margin: 16px 0 24px;
+    
+    .age-check {
+      margin-top: 12px;
+      display: block;
+    }
+    
+    a {
+      color: var(--primary-color);
+      text-decoration: none;
+      
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+    
+    mat-error {
+      margin-top: 4px;
+      font-size: 0.75rem;
+    }
+  }
+  
+  .register-button {
+    height: 44px;
+    font-size: 16px;
+    font-weight: 500;
+    width: 100%;
+  }
+}
+
+// Alternative Registration Options
+.alternative-register {
+  margin: 24px 0;
+  
+  mat-divider {
+    margin: 24px 0;
+    position: relative;
+    
+    .divider-text {
+      background-color: var(--card-bg);
+      padding: 0 12px;
+      font-size: 0.9rem;
+      color: var(--text-color);
+      opacity: 0.7;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+  }
+  
+  .social-buttons {
+    margin-top: 20px;
+    width: 100%;
+    gap: 16px;
+    
+    button {
+      flex: 1;
+      height: 40px;
+      font-size: 0.9rem;
+      
+      img {
+        height: 18px;
+        margin-right: 8px;
+      }
+    }
+    
+    .google-btn {
+      border-color: #4285F4;
+    }
+    
+    .facebook-btn {
+      border-color: #3b5998;
+    }
+  }
+}
+
+// Login Prompt
+.login-prompt {
+  margin-top: 8px;
+  width: 100%;
+  
+  span {
+    color: var(--text-color);
+    opacity: 0.8;
+    font-size: 0.95rem;
+  }
+  
+  button {
+    font-weight: 500;
+  }
+}
+
+// Dark Theme Overrides
+:host-context(.dark-theme) {
+  .register-card {
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+  }
+  
+  .error-alert {
+    background-color: rgba(244, 67, 54, 0.15);
+  }
+  
+  .alternative-register mat-divider .divider-text {
+    background-color: var(--card-bg);
+  }
+}

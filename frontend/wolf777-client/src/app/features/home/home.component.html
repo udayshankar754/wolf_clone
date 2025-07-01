@@ -1,0 +1,219 @@
+<div class="home-container">
+  <!-- Hero Section -->
+  <section class="hero-section">
+    <div class="hero-content">
+      <h1 class="hero-title">India's Premier Betting Platform</h1>
+      <p class="hero-text">
+        Experience the thrill of sports betting and casino games with Wolf777. 
+        Get exclusive bonuses and lightning-fast withdrawals!
+      </p>
+      <div class="hero-buttons">
+        <button *ngIf="!isAuthenticated" mat-raised-button color="primary" class="cta-button" (click)="register()">
+          Register Now
+        </button>
+        <button mat-raised-button color="accent" routerLink="/sports">
+          Explore Sports
+        </button>
+        <button mat-raised-button routerLink="/casino">
+          Play Casino
+        </button>
+      </div>
+      <div class="promo-banner" *ngIf="!isAuthenticated">
+        <div class="promo-text">
+          <strong>Welcome Bonus:</strong> Get 100% up to ₹10,000 on your first deposit!
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Featured Events Section -->
+  <section class="section featured-events-section">
+    <div class="section-header">
+      <h2 class="section-title">Featured Events</h2>
+      <a routerLink="/sports" class="view-all">
+        View All <mat-icon>arrow_forward</mat-icon>
+      </a>
+    </div>
+
+    <div class="cards-container" fxLayout="row wrap" fxLayoutGap="16px grid">
+      <div class="card-wrapper" *ngFor="let event of featuredEvents" fxFlex="100%" fxFlex.gt-xs="50%" fxFlex.gt-sm="25%">
+        <mat-card class="event-card" (click)="navigateToEvent(event.id, event.sportType)">
+          <div class="card-image-container">
+            <img mat-card-image [src]="event.image" [alt]="event.title" class="card-image">
+            <div class="card-overlay">
+              <span class="event-time">
+                {{ event.startTime | date:'MMM d, h:mm a' }}
+              </span>
+              <span class="event-type">
+                <mat-icon *ngIf="event.sportType === 'cricket'">sports_cricket</mat-icon>
+                <mat-icon *ngIf="event.sportType === 'football'">sports_soccer</mat-icon>
+                <mat-icon *ngIf="event.sportType === 'tennis'">sports_tennis</mat-icon>
+                {{ event.sportType | titlecase }}
+              </span>
+            </div>
+          </div>
+          <mat-card-content>
+            <h3 class="card-title">{{ event.title }}</h3>
+            <div class="odds-container">
+              <div class="odd" *ngIf="event.odds.home">
+                <span class="odd-label">1</span>
+                <span class="odd-value">{{ event.odds.home }}</span>
+              </div>
+              <div class="odd" *ngIf="event.odds.draw">
+                <span class="odd-label">X</span>
+                <span class="odd-value">{{ event.odds.draw }}</span>
+              </div>
+              <div class="odd" *ngIf="event.odds.away">
+                <span class="odd-label">2</span>
+                <span class="odd-value">{{ event.odds.away }}</span>
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </div>
+  </section>
+
+  <!-- Casino Games Section -->
+  <section class="section casino-games-section">
+    <div class="section-header">
+      <h2 class="section-title">Popular Casino Games</h2>
+      <a routerLink="/casino" class="view-all">
+        View All <mat-icon>arrow_forward</mat-icon>
+      </a>
+    </div>
+
+    <div class="cards-container" fxLayout="row wrap" fxLayoutGap="16px grid">
+      <div class="card-wrapper" *ngFor="let game of popularCasinoGames" fxFlex="100%" fxFlex.gt-xs="50%" fxFlex.gt-sm="25%">
+        <mat-card class="game-card" (click)="navigateToGame(game.id)">
+          <div class="card-image-container">
+            <img mat-card-image [src]="game.image" [alt]="game.name" class="card-image">
+            <div class="card-overlay">
+              <span class="game-provider">
+                {{ game.provider }}
+              </span>
+              <span class="players-count" *ngIf="game.playersNow">
+                <mat-icon>people</mat-icon> {{ game.playersNow }}
+              </span>
+            </div>
+          </div>
+          <mat-card-content>
+            <h3 class="card-title">{{ game.name }}</h3>
+            <div class="game-details">
+              <span class="game-category">{{ game.category | titlecase }}</span>
+              <span class="game-rtp">RTP: {{ game.rtp }}%</span>
+            </div>
+          </mat-card-content>
+          <mat-card-actions>
+            <button mat-button color="primary" class="play-button">
+              PLAY NOW
+            </button>
+          </mat-card-actions>
+        </mat-card>
+      </div>
+    </div>
+  </section>
+
+  <!-- Promotions Section -->
+  <section class="section promotions-section">
+    <div class="section-header">
+      <h2 class="section-title">Latest Promotions</h2>
+      <a routerLink="/promotions" class="view-all">
+        View All <mat-icon>arrow_forward</mat-icon>
+      </a>
+    </div>
+
+    <div class="cards-container" fxLayout="row wrap" fxLayoutGap="16px grid">
+      <div class="card-wrapper" *ngFor="let promo of promotions" fxFlex="100%" fxFlex.gt-xs="33.33%">
+        <mat-card class="promo-card" (click)="navigateToPromotion(promo.id)">
+          <div class="card-image-container">
+            <img mat-card-image [src]="promo.image" [alt]="promo.title" class="card-image">
+            <div class="card-overlay">
+              <span class="promo-category">{{ promo.category | titlecase }}</span>
+            </div>
+          </div>
+          <mat-card-content>
+            <h3 class="card-title">{{ promo.title }}</h3>
+            <p class="promo-description">{{ promo.description }}</p>
+          </mat-card-content>
+          <mat-card-actions>
+            <button mat-button color="primary">
+              CLAIM NOW
+            </button>
+          </mat-card-actions>
+        </mat-card>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features Section -->
+  <section class="section features-section">
+    <h2 class="section-title text-center">Why Choose Wolf777</h2>
+    
+    <div class="features-grid" fxLayout="row wrap" fxLayoutGap="24px grid">
+      <div class="feature" fxFlex="100%" fxFlex.gt-xs="50%" fxFlex.gt-sm="25%">
+        <div class="feature-icon">
+          <mat-icon>bolt</mat-icon>
+        </div>
+        <h3 class="feature-title">Fast Withdrawals</h3>
+        <p class="feature-description">
+          Quick and hassle-free withdrawals processed within 30 minutes.
+        </p>
+      </div>
+      
+      <div class="feature" fxFlex="100%" fxFlex.gt-xs="50%" fxFlex.gt-sm="25%">
+        <div class="feature-icon">
+          <mat-icon>security</mat-icon>
+        </div>
+        <h3 class="feature-title">Secure Platform</h3>
+        <p class="feature-description">
+          State-of-the-art security with SSL encryption and secure payment methods.
+        </p>
+      </div>
+      
+      <div class="feature" fxFlex="100%" fxFlex.gt-xs="50%" fxFlex.gt-sm="25%">
+        <div class="feature-icon">
+          <mat-icon>sports_cricket</mat-icon>
+        </div>
+        <h3 class="feature-title">Extensive Sports Coverage</h3>
+        <p class="feature-description">
+          Wide range of sports with competitive odds and live betting options.
+        </p>
+      </div>
+      
+      <div class="feature" fxFlex="100%" fxFlex.gt-xs="50%" fxFlex.gt-sm="25%">
+        <div class="feature-icon">
+          <mat-icon>headset_mic</mat-icon>
+        </div>
+        <h3 class="feature-title">24/7 Support</h3>
+        <p class="feature-description">
+          Round-the-clock customer support available via live chat, email, and phone.
+        </p>
+      </div>
+    </div>
+  </section>
+  
+  <!-- Mobile App Banner -->
+  <section class="app-banner-section">
+    <div class="app-banner-content" fxLayout="row wrap" fxLayoutAlign="center center">
+      <div class="app-banner-text" fxFlex="100%" fxFlex.gt-sm="60%">
+        <h2>Download Our Mobile App</h2>
+        <p>
+          Get the ultimate betting experience on the go with our mobile app. 
+          Place bets, play casino games, and withdraw funds anytime, anywhere.
+        </p>
+        <div class="app-buttons">
+          <a href="#" class="app-button">
+            <img src="assets/images/app-store.png" alt="App Store">
+          </a>
+          <a href="#" class="app-button">
+            <img src="assets/images/play-store.png" alt="Play Store">
+          </a>
+        </div>
+      </div>
+      <div class="app-banner-image" fxFlex="100%" fxFlex.gt-sm="40%">
+        <img src="assets/images/mobile-app-mockup.png" alt="Wolf777 Mobile App">
+      </div>
+    </div>
+  </section>
+</div>

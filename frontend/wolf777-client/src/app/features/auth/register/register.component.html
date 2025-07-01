@@ -1,0 +1,214 @@
+<div class="register-container" fxLayout="column" fxLayoutAlign="center center">
+  <div class="register-card-wrapper" fxFlex="100%" fxFlex.gt-sm="600px">
+    <mat-card class="register-card">
+      <mat-card-header>
+        <div class="register-header">
+          <div class="logo-container">
+            <img src="assets/images/wolf777-logo.png" alt="Wolf777" class="logo">
+          </div>
+          <h1 class="register-title">Create Account</h1>
+          <p class="register-subtitle">Join Wolf777 for the best betting experience</p>
+        </div>
+      </mat-card-header>
+
+      <!-- Error Alert -->
+      <div class="error-alert" *ngIf="error" fxLayout="row" fxLayoutAlign="start center">
+        <mat-icon>error_outline</mat-icon>
+        <span>{{ error }}</span>
+      </div>
+
+      <mat-card-content>
+        <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" fxLayout="column">
+          <!-- Form fields in two columns for larger screens -->
+          <div fxLayout="row wrap" fxLayoutGap="16px grid">
+            <!-- Full Name -->
+            <div fxFlex="100%" fxFlex.gt-xs="calc(50% - 16px)">
+              <mat-form-field appearance="outline">
+                <mat-label>Full Name</mat-label>
+                <input matInput formControlName="fullName" autocomplete="name">
+                <mat-icon matPrefix>person</mat-icon>
+                <mat-error *ngIf="f['fullName'].errors?.['required']">
+                  Full name is required
+                </mat-error>
+                <mat-error *ngIf="f['fullName'].errors?.['minlength']">
+                  Full name must be at least 3 characters
+                </mat-error>
+              </mat-form-field>
+            </div>
+
+            <!-- Username -->
+            <div fxFlex="100%" fxFlex.gt-xs="calc(50% - 16px)">
+              <mat-form-field appearance="outline">
+                <mat-label>Username</mat-label>
+                <input matInput formControlName="username" autocomplete="username">
+                <mat-icon matPrefix>alternate_email</mat-icon>
+                <mat-error *ngIf="f['username'].errors?.['required']">
+                  Username is required
+                </mat-error>
+                <mat-error *ngIf="f['username'].errors?.['minlength']">
+                  Username must be at least 4 characters
+                </mat-error>
+                <mat-error *ngIf="f['username'].errors?.['pattern']">
+                  Username can only contain letters, numbers, dots, underscores and hyphens
+                </mat-error>
+              </mat-form-field>
+            </div>
+
+            <!-- Email -->
+            <div fxFlex="100%" fxFlex.gt-xs="calc(50% - 16px)">
+              <mat-form-field appearance="outline">
+                <mat-label>Email</mat-label>
+                <input matInput formControlName="email" type="email" autocomplete="email">
+                <mat-icon matPrefix>email</mat-icon>
+                <mat-error *ngIf="f['email'].errors?.['required']">
+                  Email is required
+                </mat-error>
+                <mat-error *ngIf="f['email'].errors?.['email']">
+                  Please enter a valid email address
+                </mat-error>
+              </mat-form-field>
+            </div>
+
+            <!-- Mobile -->
+            <div fxFlex="100%" fxFlex.gt-xs="calc(50% - 16px)">
+              <mat-form-field appearance="outline">
+                <mat-label>Mobile Number</mat-label>
+                <input matInput formControlName="mobile" type="tel" autocomplete="tel">
+                <mat-icon matPrefix>smartphone</mat-icon>
+                <mat-error *ngIf="f['mobile'].errors?.['required']">
+                  Mobile number is required
+                </mat-error>
+                <mat-error *ngIf="f['mobile'].errors?.['pattern']">
+                  Please enter a valid 10-digit mobile number
+                </mat-error>
+              </mat-form-field>
+            </div>
+
+            <!-- Password -->
+            <div fxFlex="100%" fxFlex.gt-xs="calc(50% - 16px)">
+              <mat-form-field appearance="outline">
+                <mat-label>Password</mat-label>
+                <input matInput [type]="hidePassword ? 'password' : 'text'" formControlName="password" autocomplete="new-password">
+                <mat-icon matPrefix>lock</mat-icon>
+                <button type="button" mat-icon-button matSuffix (click)="hidePassword = !hidePassword" [attr.aria-label]="'Hide password'" [attr.aria-pressed]="hidePassword">
+                  <mat-icon>{{ hidePassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+                </button>
+                <mat-error *ngIf="f['password'].errors?.['required']">
+                  Password is required
+                </mat-error>
+                <mat-error *ngIf="f['password'].errors?.['minlength']">
+                  Password must be at least 8 characters
+                </mat-error>
+                <mat-error *ngIf="f['password'].errors?.['passwordStrength']">
+                  Password must contain uppercase, lowercase, number and special character
+                </mat-error>
+              </mat-form-field>
+            </div>
+
+            <!-- Confirm Password -->
+            <div fxFlex="100%" fxFlex.gt-xs="calc(50% - 16px)">
+              <mat-form-field appearance="outline">
+                <mat-label>Confirm Password</mat-label>
+                <input matInput [type]="hideConfirmPassword ? 'password' : 'text'" formControlName="confirmPassword" autocomplete="new-password">
+                <mat-icon matPrefix>lock</mat-icon>
+                <button type="button" mat-icon-button matSuffix (click)="hideConfirmPassword = !hideConfirmPassword" [attr.aria-label]="'Hide confirm password'" [attr.aria-pressed]="hideConfirmPassword">
+                  <mat-icon>{{ hideConfirmPassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+                </button>
+                <mat-error *ngIf="f['confirmPassword'].errors?.['required']">
+                  Please confirm your password
+                </mat-error>
+                <mat-error *ngIf="registerForm.errors?.['passwordMismatch']">
+                  Passwords do not match
+                </mat-error>
+              </mat-form-field>
+            </div>
+
+            <!-- Country -->
+            <div fxFlex="100%" fxFlex.gt-xs="calc(50% - 16px)">
+              <mat-form-field appearance="outline">
+                <mat-label>Country</mat-label>
+                <mat-select formControlName="country">
+                  <mat-option value="India">India</mat-option>
+                  <mat-option value="Pakistan">Pakistan</mat-option>
+                  <mat-option value="Bangladesh">Bangladesh</mat-option>
+                  <mat-option value="Nepal">Nepal</mat-option>
+                  <mat-option value="Sri Lanka">Sri Lanka</mat-option>
+                </mat-select>
+                <mat-icon matPrefix>public</mat-icon>
+                <mat-error *ngIf="f['country'].errors?.['required']">
+                  Country is required
+                </mat-error>
+              </mat-form-field>
+            </div>
+
+            <!-- Currency -->
+            <div fxFlex="100%" fxFlex.gt-xs="calc(50% - 16px)">
+              <mat-form-field appearance="outline">
+                <mat-label>Currency</mat-label>
+                <mat-select formControlName="currency">
+                  <mat-option value="INR">Indian Rupee (₹)</mat-option>
+                  <mat-option value="PKR">Pakistani Rupee (₨)</mat-option>
+                  <mat-option value="BDT">Bangladeshi Taka (৳)</mat-option>
+                  <mat-option value="NPR">Nepalese Rupee (रू)</mat-option>
+                  <mat-option value="LKR">Sri Lankan Rupee (රු)</mat-option>
+                </mat-select>
+                <mat-icon matPrefix>currency_exchange</mat-icon>
+                <mat-error *ngIf="f['currency'].errors?.['required']">
+                  Currency is required
+                </mat-error>
+              </mat-form-field>
+            </div>
+          </div>
+
+          <!-- Terms and Conditions Checkboxes -->
+          <div class="terms-checkboxes">
+            <mat-checkbox formControlName="agreeTerms" color="primary">
+              I agree to the <a href="/terms" target="_blank">Terms & Conditions</a> and <a href="/privacy" target="_blank">Privacy Policy</a>
+            </mat-checkbox>
+            <mat-error *ngIf="f['agreeTerms'].touched && f['agreeTerms'].errors?.['required']">
+              You must agree to the terms and conditions
+            </mat-error>
+            
+            <mat-checkbox formControlName="age18Plus" color="primary" class="age-check">
+              I confirm that I am at least 18 years of age
+            </mat-checkbox>
+            <mat-error *ngIf="f['age18Plus'].touched && f['age18Plus'].errors?.['required']">
+              You must confirm you are at least 18 years old
+            </mat-error>
+          </div>
+
+          <!-- Register Button -->
+          <button mat-raised-button color="primary" type="submit" class="register-button" [disabled]="loading">
+            <span *ngIf="!loading">Create Account</span>
+            <mat-spinner *ngIf="loading" diameter="20"></mat-spinner>
+          </button>
+        </form>
+
+        <!-- Alternative Registration Options -->
+        <div class="alternative-register">
+          <mat-divider>
+            <span class="divider-text">Or register with</span>
+          </mat-divider>
+
+          <div class="social-buttons" fxLayout="row" fxLayoutAlign="space-around center">
+            <button mat-stroked-button class="google-btn">
+              <img src="assets/images/social/google.svg" alt="Google">
+              <span>Google</span>
+            </button>
+            <button mat-stroked-button class="facebook-btn">
+              <img src="assets/images/social/facebook.svg" alt="Facebook">
+              <span>Facebook</span>
+            </button>
+          </div>
+        </div>
+      </mat-card-content>
+
+      <mat-card-actions>
+        <div class="login-prompt" fxLayout="row" fxLayoutAlign="center center">
+          <span>Already have an account?</span>
+          <button mat-button color="primary" type="button" (click)="navigateToLogin()">Log In</button>
+        </div>
+      </mat-card-actions>
+    </mat-card>
+  </div>
+</div>

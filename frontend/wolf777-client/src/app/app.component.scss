@@ -1,0 +1,56 @@
+// Main application styles
+:host {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.app-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: var(--background-color);
+  color: var(--text-color);
+  transition: background-color 0.3s ease, color 0.3s ease;
+  
+  // Default light theme variables
+  --background-color: #f4f6f8;
+  --text-color: #333;
+  --primary-color: #c2185b;
+  --secondary-color: #3c73d2;
+  --accent-color: #ff9800;
+  --success-color: #4caf50;
+  --warning-color: #ff9800;
+  --error-color: #f44336;
+  --card-bg: #ffffff;
+  --header-bg: #ffffff;
+  --footer-bg: #1d1d1d;
+
+  // Dark theme overrides
+  &.dark-theme {
+    --background-color: #121212;
+    --text-color: #e0e0e0;
+    --primary-color: #e91e63;
+    --secondary-color: #536dfe;
+    --accent-color: #ffc107;
+    --card-bg: #1e1e1e;
+    --header-bg: #1a1a1a;
+    --footer-bg: #0a0a0a;
+  }
+}
+
+.main-content {
+  flex: 1;
+  padding-top: 60px; // Adjust for fixed header
+}
+
+.page-container {
+  max-width: 1600px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 1rem;
+
+  @media (max-width: 768px) {
+    padding: 0.5rem;
+  }
+}

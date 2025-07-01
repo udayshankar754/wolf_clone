@@ -1,0 +1,72 @@
+<footer class="footer">
+  <div class="footer-container">
+    <!-- Payment Methods -->
+    <div class="payment-methods">
+      <h4>Payment Methods</h4>
+      <div class="payment-icons">
+        <div *ngFor="let method of paymentMethods" class="payment-icon">
+          <img [src]="method.image" [alt]="method.name">
+        </div>
+      </div>
+    </div>
+    
+    <!-- Footer Links -->
+    <div class="footer-links">
+      <div class="footer-column" *ngFor="let column of footerLinks">
+        <h4>{{ column.title }}</h4>
+        <ul>
+          <li *ngFor="let link of column.links">
+            <a [routerLink]="link.url">{{ link.name }}</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+    
+    <!-- Social and App Links -->
+    <div class="footer-social">
+      <div class="social-links">
+        <h4>Follow Us</h4>
+        <div class="social-icons">
+          <a *ngFor="let social of socialLinks" [href]="social.url" target="_blank" class="social-icon">
+            <mat-icon>{{ social.icon }}</mat-icon>
+          </a>
+        </div>
+      </div>
+      
+      <div class="app-links">
+        <h4>Download Our App</h4>
+        <div class="app-buttons">
+          <a href="#" class="app-button">
+            <img src="assets/images/app-store.png" alt="App Store">
+          </a>
+          <a href="#" class="app-button">
+            <img src="assets/images/play-store.png" alt="Play Store">
+          </a>
+        </div>
+      </div>
+    </div>
+    
+    <!-- About Text -->
+    <div class="footer-about">
+      <div class="logo">
+        <img src="assets/images/wolf777-logo.png" alt="Wolf777">
+      </div>
+      <p class="about-text">
+        Wolf777 is the premier online betting platform offering sports betting and casino games in India.
+        We provide a secure, fair, and responsible gaming environment with fast withdrawals and 24/7 customer support.
+      </p>
+      <div class="responsible-gambling">
+        <img src="assets/images/responsible-gambling.png" alt="Responsible Gambling">
+        <span>18+</span>
+      </div>
+    </div>
+    
+    <!-- Copyright -->
+    <div class="footer-copyright">
+      <p>&copy; {{ currentYear }} Wolf777. All rights reserved.</p>
+      <p class="disclaimer">
+        Gambling involves risk. Please gamble responsibly. Wolf777 supports responsible gambling.
+      </p>
+    </div>
+  </div>
+</footer>

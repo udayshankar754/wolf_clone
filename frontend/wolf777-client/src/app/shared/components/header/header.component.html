@@ -1,0 +1,126 @@
+<header class="header">
+  <div class="header-container">
+    <!-- Logo Section -->
+    <div class="logo-container">
+      <a routerLink="/" class="logo">
+        <img src="assets/images/wolf777-logo.png" alt="Wolf777" class="logo-img">
+      </a>
+      <button mat-icon-button class="menu-toggle" (click)="onToggleMenu()" aria-label="Toggle menu">
+        <mat-icon>{{ isMobileMenuOpen ? 'close' : 'menu' }}</mat-icon>
+      </button>
+    </div>
+
+    <!-- Navigation for desktop -->
+    <nav class="nav-desktop" [class.hidden]="isMobileMenuOpen">
+      <ul class="nav-list">
+        <li [class.active]="isActiveRoute('/')">
+          <a routerLink="/" class="nav-link">Home</a>
+        </li>
+        <li [class.active]="isActiveRoute('/sports')">
+          <a routerLink="/sports" class="nav-link">Sports</a>
+        </li>
+        <li [class.active]="isActiveRoute('/casino')">
+          <a routerLink="/casino" class="nav-link">Casino</a>
+        </li>
+        <li [class.active]="isActiveRoute('/promotions')">
+          <a routerLink="/promotions" class="nav-link">Promotions</a>
+        </li>
+      </ul>
+    </nav>
+
+    <!-- User Controls Section -->
+    <div class="user-controls" [class.hidden]="isMobileMenuOpen">
+      <ng-container *ngIf="currentUser; else notLoggedIn">
+        <!-- Wallet Balance -->
+        <button mat-button class="wallet-btn" (click)="navigateToWallet()">
+          <mat-icon>account_balance_wallet</mat-icon>
+          <span class="balance" *ngIf="currentUser">{{ '₹10,000' }}</span>
+        </button>
+
+        <!-- User Menu -->
+        <button mat-button [matMenuTriggerFor]="userMenu" class="user-menu-btn">
+          <div class="user-avatar">
+            <img *ngIf="currentUser.avatar" [src]="currentUser.avatar" alt="User avatar">
+            <mat-icon *ngIf="!currentUser.avatar">account_circle</mat-icon>
+          </div>
+          <span class="username">{{ currentUser.name || 'User' }}</span>
+          <mat-icon>arrow_drop_down</mat-icon>
+        </button>
+        <mat-menu #userMenu="matMenu" xPosition="before">
+          <button mat-menu-item (click)="navigateToProfile()">
+            <mat-icon>person</mat-icon>
+            <span>My Profile</span>
+          </button>
+          <button mat-menu-item (click)="navigateToWallet()">
+            <mat-icon>account_balance_wallet</mat-icon>
+            <span>Wallet</span>
+          </button>
+          <button mat-menu-item routerLink="/profile/bets">
+            <mat-icon>receipt</mat-icon>
+            <span>My Bets</span>
+          </button>
+          <button mat-menu-item routerLink="/profile/transactions">
+            <mat-icon>history</mat-icon>
+            <span>Transactions</span>
+          </button>
+          <button mat-menu-item (click)="logout()">
+            <mat-icon>exit_to_app</mat-icon>
+            <span>Logout</span>
+          </button>
+        </mat-menu>
+      </ng-container>
+
+      <!-- Not Logged In Template -->
+      <ng-template #notLoggedIn>
+        <div class="auth-buttons">
+          <a mat-button routerLink="/auth/login" class="login-btn">Login</a>
+          <a mat-flat-button routerLink="/auth/register" class="register-btn" color="primary">Register</a>
+        </div>
+      </ng-template>
+    </div>
+  </div>
+
+  <!-- Mobile Navigation Menu (Overlaid) -->
+  <div class="mobile-menu" [class.open]="isMobileMenuOpen">
+    <div class="mobile-menu-content">
+      <!-- Auth Actions for Mobile -->
+      <div class="mobile-auth" *ngIf="!currentUser">
+        <a mat-button routerLink="/auth/login" class="login-btn mobile-login">Login</a>
+        <a mat-flat-button routerLink="/auth/register" class="register-btn mobile-register" color="primary">Register</a>
+      </div>
+
+      <!-- User Info for Mobile -->
+      <div class="mobile-user-info" *ngIf="currentUser">
+        <div class="user-avatar-mobile">
+          <img *ngIf="currentUser.avatar" [src]="currentUser.avatar" alt="User avatar">
+          <mat-icon *ngIf="!currentUser.avatar">account_circle</mat-icon>
+        </div>
+        <div class="user-details">
+          <h3 class="user-name">{{ currentUser.name || 'User' }}</h3>
+          <button mat-stroked-button class="wallet-btn-mobile" (click)="navigateToWallet()">
+            <mat-icon>account_balance_wallet</mat-icon>
+            <span>₹10,000</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Navigation Links -->
+      <nav class="mobile-nav">
+        <ul class="mobile-nav-list">
+          <li><a routerLink="/" (click)="onToggleMenu()">Home</a></li>
+          <li><a routerLink="/sports" (click)="onToggleMenu()">Sports</a></li>
+          <li><a routerLink="/casino" (click)="onToggleMenu()">Casino</a></li>
+          <li><a routerLink="/promotions" (click)="onToggleMenu()">Promotions</a></li>
+
+          <!-- User Specific Links -->
+          <ng-container *ngIf="currentUser">
+            <li><a routerLink="/profile" (click)="onToggleMenu()">My Profile</a></li>
+            <li><a routerLink="/profile/bets" (click)="onToggleMenu()">My Bets</a></li>
+            <li><a routerLink="/profile/transactions" (click)="onToggleMenu()">Transactions</a></li>
+            <li><a (click)="logout(); onToggleMenu()">Logout</a></li>
+          </ng-container>
+        </ul>
+      </nav>
+    </div>
+  </div>
+</header>
